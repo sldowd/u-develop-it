@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "migrate": "sqlite3 db/election.db < db/schema.sql",
-    "seed": "sqlite3 db/election.db < db/seeds.sql",
-    "db": "sqlite3 db/election.db",
+    "migrate": "sqlite3 db/elections.db < db/schema.sql",
+    "seed": "sqlite3 db/elections.db < db/seeds.sql",
+    "db": "sqlite3 db/elections.db",
     "start": "node server.js"
   },
   "repository": {
