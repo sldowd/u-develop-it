@@ -17,7 +17,7 @@ const db = new sqlite3.Database('./db/elections.db', err => {
 
     console.log('Connected to the election database.');
 });
-
+//==============================candidate routes=======================
 // Delete a candidate
 app.delete('/api/candidate/:id', (req,res) => {
     const sql = `DELETE FROM candidates WHERE id = ?`;
@@ -79,6 +79,7 @@ app.post('/api/candidate', ({body}, res) => {
     });
 });
 
+// get all candidates
 app.get('/api/candidates', (req, res) => {
     // set SQL query to SQL variable
     const sql = `SELECT candidates.*, parties.name
@@ -98,6 +99,81 @@ app.get('/api/candidates', (req, res) => {
         res.json({
             message: 'success',
             data: rows
+        });
+    });
+});
+
+// UPDATE a candidates party
+app.put('/api/candidate/:id', (req, res) =>{
+    const errors = inputCheck(req.body, 'party_id');
+
+    if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+    }
+
+    const sql = `UPDATE candidates SET party_id = ?
+                WHERE id = ?`;
+    const params = [req.body.party_id, req.params.id];
+
+    db.run(sql, params, function(err, result) {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: req.body,
+            changes: this.changes
+        });
+    });
+});
+
+//====================================PARTY ROUTES=========================
+// route to display all parties
+app.get('/api/parties', (req,res) => {
+    const sql = `SELECT * FROM parties`;
+    const params = [];
+    db.all(sql, params, (err,rows) => {
+        if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
+// return party by id
+app.get('/api/party/:id', (req,res) => {
+    const sql = `SELECT * FROM parties WHERE id = ?`;
+    const params = [req.params.id];
+    db.get(sql, params, (err,row) => {
+        if (err) {
+            res.status(400).json({ error: err.message})
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: row
+        });
+    });
+});
+
+// route to delete parties 
+app.delete('/api/party/:id', (req, res) => {
+    const sql = `DELETE FROM parties WHERE id = ?`;
+    const params = [req.params.id];
+    db.run(sql, params, function(err, result) {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'successfully deleted',
+            changes: this.changes
         });
     });
 });
